@@ -1,9 +1,13 @@
 import React, { Component } from 'react'
-import { Card, Button, Checkbox, Form, Input } from 'antd'
+import { Card, Button, Checkbox, Form, Input, message } from 'antd'
 import './index.scss'
 import logo from 'assets/logo.png'
+import { login } from 'api/user'
 
 export default class Login extends Component {
+  state = {
+    loading: false,
+  }
   render() {
     return (
       <div className="login">
@@ -15,7 +19,7 @@ export default class Login extends Component {
             onFinish={this.onFinish}
             initialValues={{
               mobile: '13826442480',
-              code: '123456',
+              code: '246810',
               agree: true,
             }}
           >
@@ -61,7 +65,12 @@ export default class Login extends Component {
             </Form.Item>
 
             <Form.Item>
-              <Button type="primary" htmlType="submit" block="true">
+              <Button
+                type="primary"
+                htmlType="submit"
+                block="true"
+                loading={this.state.loading}
+              >
                 Login
               </Button>
             </Form.Item>
@@ -71,7 +80,33 @@ export default class Login extends Component {
     )
   }
 
-  onFinish = (value) => {
-    console.log(value)
+  onFinish = async ({ mobile, code }) => {
+    // 一点击登录，就让loading变成true
+    this.setState({
+      loading: true,
+    })
+    try {
+      const res = await login(mobile, code)
+      console.log(res)
+      // 登录成功
+
+      // 1.提示登录成功
+      message.success('Login successfully', 1, () => {
+        // 2.保存token
+        localStorage.setItem('token', res.data.token)
+        // 3.跳转到页面
+        this.props.history.push('/home')
+      })
+    } catch (error) {
+      // console.log(error.response.data.message)
+      // 登录失败
+      // 1.提示登录失败
+      message.warning(error.response.data.message, 1, () => {
+        // 2.改变loading状态
+        this.setState({
+          loading: false,
+        })
+      })
+    }
   }
 }
