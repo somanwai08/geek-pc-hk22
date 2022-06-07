@@ -8,3 +8,11 @@ export const login = (mobile, code) => {
     data: { mobile, code },
   })
 }
+
+// 获取用户登录信息
+export const getUserProfile = () => {
+  return request({
+    method: 'get',
+    url: '/user/profile',
+  })
+}

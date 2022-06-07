@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { Card, Button, Checkbox, Form, Input, message } from 'antd'
-import './index.scss'
+import styles from './index.module.scss'
 import logo from 'assets/logo.png'
 import { login } from 'api/user'
+import { setToken } from 'ultis/localstorage'
 
 export default class Login extends Component {
   state = {
@@ -10,7 +11,7 @@ export default class Login extends Component {
   }
   render() {
     return (
-      <div className="login">
+      <div className={styles.login}>
         <Card className="login-container">
           <img src={logo} alt="" className="login-logo" />
           {/* form */}
@@ -18,7 +19,7 @@ export default class Login extends Component {
             size="large"
             onFinish={this.onFinish}
             initialValues={{
-              mobile: '13826442480',
+              mobile: '13911111111',
               code: '246810',
               agree: true,
             }}
@@ -93,9 +94,16 @@ export default class Login extends Component {
       // 1.提示登录成功
       message.success('Login successfully', 1, () => {
         // 2.保存token
-        localStorage.setItem('token', res.data.token)
+        setToken(res.data.token)
         // 3.跳转到页面
-        this.props.history.push('/home')
+        const { state } = this.props.location
+        if (state) {
+          // 如果有state，就调到state所记录的原位置
+          this.props.history.push(state.from)
+        } else {
+          // 如果没有state，就跳转到首页
+          this.props.history.push('/home')
+        }
       })
     } catch (error) {
       // console.log(error.response.data.message)
